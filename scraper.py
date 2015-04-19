@@ -27,7 +27,7 @@ table = soup.find('table',{'class':'t1'}) #  find docs table
 links = table.findAll('a', href=True)
 
 for link in links:
-	url = link['href']
+	url = "http://www.merton.gov.uk" + link['href']
 	if '.csv' in url:
 		title = link.contents[0]
 		# create the right strings for the new filename
