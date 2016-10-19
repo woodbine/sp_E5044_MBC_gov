@@ -106,7 +106,6 @@ links = table.findAll('a', href=True)
 for link in links:
     url = "http://www.merton.gov.uk" + link['href']
     if '.csv' in url:
-<<<<<<< HEAD
         title = link.parent.previousSibling.previousSibling.text.strip()
         try:
             csvYr = title.split('-')[1][:4]
@@ -115,11 +114,6 @@ for link in links:
             csvYr = title.split(' ')[1]
             csvMth = title.split(' ')[0][:3]
 
-=======
-        title = link.contents[0]
-        csvYr = title.split(' ')[1]
-        csvMth = title.split(' ')[0][:3]
->>>>>>> 5a97d12be8b25da87dc406dfcefdb9649d1b0dfa
         csvMth = convert_mth_strings(csvMth.upper())
         todays_date = str(datetime.now())
         data.append([csvYr, csvMth, url])
@@ -158,8 +152,5 @@ if errors > 0:
 
 
 #### EOF
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 5a97d12be8b25da87dc406dfcefdb9649d1b0dfa
