@@ -104,7 +104,7 @@ table = soup.find('table',{'class':'t1'})
 links = table.findAll('a', href=True)
 
 for link in links:
-    url = "http://www.merton.gov.uk" + link['href']
+    url = "http://www2.merton.gov.uk/" + link['href'].split('/')[-1]
     if '.csv' in url:
         title = link.parent.previousSibling.previousSibling.text.strip()
         try:
@@ -122,11 +122,18 @@ archive_soup = BeautifulSoup(archive_html, 'lxml')
 table = archive_soup.find('table',{'class':'t1'})
 links = table.findAll('a', href=True)
 for link in links:
-    url = "http://www.merton.gov.uk" + link['href']
+    url = "http://www2.merton.gov.uk/" + link['href'].split('/')[-1]
     if '.csv' in url:
-        title = link.contents[0]
-        csvYr = title.split(' ')[1]
-        csvMth = title.split(' ')[0][:3]
+        title = link.text
+        try:
+            csvYr = title.split(' ')[1]
+        except:
+            csvYr = title.split('-')[1]
+        try:
+            csvMth = title.split(' ')[0][:3]
+        except:
+            csvMth = title.split('-')[0][:3]
+        csvYr = csvYr.replace('.csv', '')
         csvMth = convert_mth_strings(csvMth.upper())
         todays_date = str(datetime.now())
         data.append([csvYr, csvMth, url])
