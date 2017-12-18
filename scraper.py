@@ -11,7 +11,9 @@ from bs4 import BeautifulSoup
 
 
 
-#### FUNCTIONS 1.0
+
+#### FUNCTIONS 1.1
+import requests   # import requests to avoid errors
 
 def validateFilename(filename):
     filenameregex = '^[a-zA-Z0-9]+_[a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9][0-9][0-9][0-9]_[0-9QY][0-9]$'
@@ -39,19 +41,23 @@ def validateFilename(filename):
 
 def validateURL(url):
     try:
-        r = urllib2.urlopen(url)
+#         r = urllib2.urlopen(url)
+        r = requests.get(url, verify=False)
         count = 1
-        while r.getcode() == 500 and count < 4:
+#         while r.getcode() == 500 and count < 4:
+        while r.status_code == 500 and count < 4:
             print ("Attempt {0} - Status code: {1}. Retrying.".format(count, r.status_code))
             count += 1
-            r = urllib2.urlopen(url)
+#             r = urllib2.urlopen(url)
+            r = requests.get(url, verify=False)
         sourceFilename = r.headers.get('Content-Disposition')
 
         if sourceFilename:
             ext = os.path.splitext(sourceFilename)[1].replace('"', '').replace(';', '').replace(' ', '')
         else:
             ext = os.path.splitext(url)[1]
-        validURL = r.getcode() == 200
+#         validURL = r.getcode() == 200
+        validURL = r.status_code == 200
         validFiletype = ext.lower() in ['.csv', '.xls', '.xlsx']
         return validURL, validFiletype
     except:
@@ -87,16 +93,17 @@ def convert_mth_strings ( mth_string ):
 #### VARIABLES 1.0
 
 entity_id = "E5044_MBC_gov"
-url = "http://www.merton.gov.uk/council/dp-foi/opendata/spending.htm"
-archive_url = 'http://www.merton.gov.uk/council/dp-foi/opendata/older-spend.htm'
+url = "https://www2.merton.gov.uk/council/dp-foi/opendata/spending.htm"
+archive_url = 'https://www2.merton.gov.uk/council/dp-foi/opendata/older-spend.htm'
 errors = 0
 data = []
 
 
 #### READ HTML 1.0
 
-html = urllib2.urlopen(url)
-soup = BeautifulSoup(html, 'lxml')
+# html = urllib2.urlopen(url)
+html = requests.get(url, verify=False)
+soup = BeautifulSoup(html.text, 'lxml')
 
 #### SCRAPE DATA
 
@@ -117,8 +124,9 @@ for link in links:
         csvMth = convert_mth_strings(csvMth.upper())
         todays_date = str(datetime.now())
         data.append([csvYr, csvMth, url])
-archive_html = urllib2.urlopen(archive_url)
-archive_soup = BeautifulSoup(archive_html, 'lxml')
+# archive_html = urllib2.urlopen(archive_url)
+archive_html = requests.get(archive_url, verify=False)
+archive_soup = BeautifulSoup(archive_html.text, 'lxml')
 table = archive_soup.find('table',{'class':'t1'})
 links = table.findAll('a', href=True)
 for link in links:
@@ -159,4 +167,3 @@ if errors > 0:
 
 
 #### EOF
-
